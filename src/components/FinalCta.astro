@@ -1,0 +1,130 @@
+---
+import Icon from './Icon.astro';
+import type { Site } from '../lib/site';
+
+interface Props {
+  site: Site;
+}
+const { site } = Astro.props;
+---
+
+<section id="contact" class="cta on-dark" aria-labelledby="contact-title">
+  <div class="container inner">
+    <h2 id="contact-title">have something that needs printing?</h2>
+    <p>Requests are free and open to everyone.</p>
+    <a class="btn btn--inverse" href={site.requestFormUrl} target="_blank" rel="noopener">
+      Request a print<Icon name="external" /><span class="visually-hidden"> (opens in new tab)</span>
+    </a>
+
+    <ul role="list" class="contact">
+      <li class="email">
+        <a href={`mailto:${site.email}`}><Icon name="mail" /><span>{site.email}</span></a>
+        <button type="button" class="copy" data-copy={site.email} aria-label="Copy email address">
+          <Icon name="copy" /><span data-copy-label>Copy</span>
+        </button>
+        <span class="visually-hidden" role="status" data-copy-status></span>
+      </li>
+      <li>
+        <a href={`https://www.instagram.com/${site.instagram}/`} target="_blank" rel="noopener">
+          <Icon name="instagram" /><span>@{site.instagram}</span><span class="visually-hidden"> (opens in new tab)</span>
+        </a>
+      </li>
+      {
+        site.extraLinks.map((l) => (
+          <li>
+            <a href={l.url} target="_blank" rel="noopener">
+              <Icon name={l.icon} />
+              <span>{l.label}</span>
+              <span class="visually-hidden"> (opens in new tab)</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .cta {
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding-block: var(--section-pad);
+    text-align: center;
+  }
+
+  .inner {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-24);
+  }
+
+  .inner h2 {
+    margin-bottom: 0;
+    max-width: 20ch;
+  }
+
+  .contact {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-24);
+    margin: var(--space-24) 0 0;
+  }
+
+  .contact li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .contact a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-8);
+    min-height: var(--tap);
+    color: var(--accent-ink);
+    text-underline-offset: 4px;
+  }
+
+  .copy {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-height: var(--tap);
+    padding: 0 var(--space-12);
+    border: 0;
+    border-radius: var(--radius-button);
+    background: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--accent-ink);
+    color: var(--accent-ink);
+    font-size: var(--text-small);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .copy :global(.icon) {
+    width: 16px;
+    height: 16px;
+  }
+</style>
+
+<script>
+  const btn = document.querySelector<HTMLButtonElement>('[data-copy]');
+  const label = btn?.querySelector<HTMLElement>('[data-copy-label]');
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+  let timer: number | undefined;
+  btn?.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy!);
+      label!.textContent = 'Copied';
+      status!.textContent = 'Email address copied';
+      clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        label!.textContent = 'Copy';
+        status!.textContent = '';
+      }, 2000);
+    } catch {
+      /* clipboard blocked: the address is still visible to select by hand */
+    }
+  });
+</script>

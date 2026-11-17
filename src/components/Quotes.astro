@@ -1,0 +1,147 @@
+---
+import Icon from './Icon.astro';
+import type { Site } from '../lib/site';
+
+interface Props {
+  quotes: Site['quotes'];
+}
+const { quotes } = Astro.props;
+const row = quotes.length >= 4; // 4+ quotes become a horizontal scroll-snap row
+---
+
+{
+  quotes.length > 0 && (
+    <section class="section" aria-labelledby="quotes-title">
+      <div class="container">
+        <h2 id="quotes-title">from the people we've printed for</h2>
+        <ul role="list" class:list={['quotes', row ? 'is-row' : `cols-${quotes.length}`]} data-quote-track>
+          {quotes.map((q) => (
+            <li class="quote">
+              <span class="mark" aria-hidden="true">
+                “
+              </span>
+              <blockquote>
+                <p>{q.text}</p>
+              </blockquote>
+              <p class="who">
+                {q.name}, {q.role}
+                {q.projectId && (
+                  <>
+                    {' · '}
+                    <a href={`#project-${q.projectId}`}>see the project</a>
+                  </>
+                )}
+              </p>
+            </li>
+          ))}
+        </ul>
+        {row && (
+          <div class="arrows">
+            <button type="button" class="arrow" aria-label="Previous quotes" data-quote-prev>
+              <Icon name="left" />
+            </button>
+            <button type="button" class="arrow" aria-label="Next quotes" data-quote-next>
+              <Icon name="right" />
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .quotes {
+    display: grid;
+    gap: var(--space-24);
+    margin: 0;
+  }
+
+  .quote {
+    display: grid;
+    gap: var(--space-16);
+    align-content: start;
+    padding: var(--space-32);
+    background: var(--surface);
+    border-radius: var(--radius-card);
+  }
+
+  .mark {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: var(--text-h1);
+    line-height: 0.6;
+    color: var(--accent);
+  }
+
+  .who {
+    color: var(--ink-muted);
+    font-size: var(--text-small);
+  }
+
+  .who a {
+    color: var(--ink);
+  }
+
+  .is-row {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .is-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .is-row .quote {
+    flex: 0 0 85%;
+    scroll-snap-align: start;
+  }
+
+  .arrows {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-8);
+    margin-top: var(--space-16);
+  }
+
+  .arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface);
+    cursor: pointer;
+  }
+
+  @media (min-width: 1024px) {
+    .cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .is-row .quote {
+      flex-basis: calc((100% - 2 * var(--space-24)) / 3);
+    }
+  }
+</style>
+
+<script>
+  const track = document.querySelector<HTMLElement>('[data-quote-track]');
+  if (track) {
+    const behavior: ScrollBehavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    document
+      .querySelector('[data-quote-prev]')
+      ?.addEventListener('click', () => track.scrollBy({ left: -track.clientWidth, behavior }));
+    document
+      .querySelector('[data-quote-next]')
+      ?.addEventListener('click', () => track.scrollBy({ left: track.clientWidth, behavior }));
+  }
+</script>

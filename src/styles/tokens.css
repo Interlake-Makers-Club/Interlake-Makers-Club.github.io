@@ -1,0 +1,89 @@
+/*
+ * Every color, font size, spacing value and radius used on the site.
+ * No other file may contain a raw color or size (see AGENTS.md).
+ */
+:root {
+  /* ---- Color roles ----
+   * Neutrals come from shopmakers.ca. --accent is a placeholder until the
+   * club's brand colors arrive (TODO(Q2)). When replacing it, re-check:
+   *   --accent-ink on --accent  >= 4.5:1  (white or --ink, whichever passes)
+   *   --accent on --bg          >= 3:1
+   * If the brand color fails, darken it in 5% lightness steps until it passes
+   * and record both hex codes here.
+   */
+  --bg: #f1e8da;
+  --surface: #e7dac4;
+  --ink: #303536;
+  --ink-muted: #5a6062;
+  --line: #d3c4aa;
+  --accent: #c2410c; /* TODO(Q2) placeholder accent */
+  --accent-ink: #ffffff;
+
+  /* ---- Fonts (TODO(Q3) default: Fraunces + Inter) ---- */
+  --font-heading: 'Fraunces Variable', Georgia, 'Times New Roman', serif;
+  --font-body: 'Inter Variable', 'Helvetica Neue', Arial, sans-serif;
+  --heading-variation: 'SOFT' 100, 'WONK' 0;
+
+  /* ---- Type scale ---- */
+  --text-h1: clamp(2.5rem, 4.5vw + 1rem, 4.5rem);
+  --text-h2: clamp(2rem, 3vw + 1rem, 3rem);
+  --text-h3: 1.25rem;
+  --text-stat: clamp(2.5rem, 4vw + 1rem, 4rem);
+  --text-large: clamp(1.125rem, 0.5vw + 1rem, 1.375rem);
+  --text-body: 1.0625rem;
+  --text-small: 0.875rem;
+  --text-button: 1rem;
+  --text-button-small: 0.9375rem;
+
+  /* ---- Spacing scale (no other values allowed) ---- */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px; /* PRD: H2 bottom margin and mobile stats padding */
+  --space-48: 48px;
+  --space-64: 64px;
+  --space-96: 96px;
+  --space-128: 128px;
+
+  /* ---- Layout ---- */
+  --container: 1280px;
+  --gutter: clamp(16px, 6vw, 96px);
+  --section-pad: clamp(64px, 8vw, 128px);
+  --header-h: 64px;
+
+  /* ---- Radius ---- */
+  --radius-button: 10px;
+  --radius-card: 16px;
+  --radius-hero: 24px;
+
+  /* ---- Component sizes ---- */
+  --logo-h: 32px;
+  --icon: 20px;
+  --tap: 44px;
+  --button-h: 48px;
+  --button-h-small: 40px;
+  --hero-frame-max: 560px;
+  --hero-max-h: 760px;
+  --hero-min-h: 560px;
+
+  /* ---- Effects ---- */
+  --dialog-shadow: 0 24px 64px rgb(0 0 0 / 0.25);
+  --backdrop: rgb(48 53 54 / 0.6);
+  --hover-darken: 12%;
+  --focus-width: 3px;
+  --focus-offset: 3px;
+
+  /* ---- Motion ---- */
+  --dur-fast: 150ms;
+  --dur: 200ms;
+  --dur-fade: 400ms;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-h: 72px;
+  }
+}

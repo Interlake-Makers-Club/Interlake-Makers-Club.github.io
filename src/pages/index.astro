@@ -1,0 +1,76 @@
+---
+// Assembles the page in PRD order. No copy lives here: content comes from
+// src/content/site.yaml and fixed copy lives in each section component.
+import '../styles/global.css';
+import { getSite } from '../lib/site';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Stats from '../components/Stats.astro';
+import Projects from '../components/Projects.astro';
+import HowItWorks from '../components/HowItWorks.astro';
+import About from '../components/About.astro';
+import Quotes from '../components/Quotes.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+import Footer from '../components/Footer.astro';
+import mark from '../assets/logo/mark.svg';
+
+const site = await getSite();
+
+const title = "Interlake Makers' Club · Free student 3D printing in Bellevue, WA";
+const description =
+  "Interlake High School's Makers' Club is a student-run 3D printing community in Bellevue, WA. We design and print useful things for anyone who asks, free, and bring our printers to local outreach events.";
+const canonical = new URL('/', Astro.site).href;
+const ogImage = new URL('/og.png', Astro.site).href;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: "Interlake Makers' Club",
+  url: canonical,
+  email: site.email,
+  logo: new URL(mark.src, Astro.site).href,
+  sameAs: [`https://www.instagram.com/${site.instagram}/`],
+};
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#f1e8da" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header site={site} />
+    <main id="main">
+      <Hero site={site} />
+      <Stats stats={site.stats} />
+      <Projects projects={site.projects} />
+      <HowItWorks site={site} />
+      <About site={site} />
+      <Quotes quotes={site.quotes} />
+      <Faq site={site} />
+      <FinalCta site={site} />
+    </main>
+    <Footer site={site} />
+  </body>
+</html>

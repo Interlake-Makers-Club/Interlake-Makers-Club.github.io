@@ -1,0 +1,326 @@
+---
+// Hero 3D carousel (PRD section 2). Posters render as plain HTML so the hero is never
+// empty; <model-viewer> loads after first paint and fades each model in over its poster.
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { Site } from '../lib/site';
+
+interface Props {
+  models: Site['heroModels'];
+}
+const { models } = Astro.props;
+const total = models.length;
+---
+
+<div class="carousel" role="region" aria-roledescription="carousel" aria-label="Featured prints" data-carousel>
+  <div class="frame" data-frame>
+    {
+      models.map((m, i) => (
+        <div
+          class:list={['slide', { 'is-active': i === 0 }]}
+          role="group"
+          aria-roledescription="slide"
+          aria-label={`${i + 1} of ${total}: ${m.caption}`}
+          aria-hidden={i === 0 ? undefined : 'true'}
+          inert={i === 0 ? undefined : true}
+          data-slide
+          data-model={m.model}
+          data-color={m.color}
+          data-alt={m.alt}
+        >
+          <Picture
+            class="poster"
+            src={m.poster}
+            alt={m.alt}
+            widths={[400, 800, 1200]}
+            sizes="(min-width: 1024px) 560px, (min-width: 640px) 480px, 100vw"
+            formats={['avif', 'webp']}
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchpriority={i === 0 ? 'high' : undefined}
+          />
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="controls">
+    <div class="captions">
+      {
+        models.map((m, i) => (
+          <p class="caption" hidden={i !== 0} data-caption>
+            {m.projectId ? <a href={`#project-${m.projectId}`}>{m.caption}</a> : m.caption}
+          </p>
+        ))
+      }
+    </div>
+    <div class="dots">
+      {
+        models.map((m, i) => (
+          <button
+            type="button"
+            class="dot"
+            aria-label={`Show model ${i + 1}: ${m.caption}`}
+            aria-current={i === 0 ? 'true' : undefined}
+            data-dot
+          >
+            <span />
+          </button>
+        ))
+      }
+    </div>
+    <button type="button" class="toggle" aria-label="Pause rotation" data-toggle>
+      <span data-icon-pause><Icon name="pause" /></span>
+      <span data-icon-play hidden><Icon name="play" /></span>
+    </button>
+  </div>
+</div>
+
+<style>
+  .carousel {
+    width: 100%;
+    max-width: var(--hero-frame-max);
+    margin-inline: auto;
+  }
+
+  .frame {
+    position: relative;
+    aspect-ratio: 1;
+    background: var(--surface);
+    border-radius: var(--radius-hero);
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity var(--dur-fade);
+  }
+
+  .slide.is-active {
+    opacity: 1;
+  }
+
+  .slide :global(.poster),
+  .slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .slide :global(model-viewer) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    opacity: 0;
+    transition: opacity var(--dur-fade);
+    --poster-color: transparent;
+  }
+
+  .slide.has-model :global(model-viewer) {
+    opacity: 1;
+  }
+
+  .slide.has-model :global(picture),
+  .slide.has-model :global(.poster) {
+    visibility: hidden;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    margin-top: var(--space-12);
+  }
+
+  .captions {
+    flex: 1;
+    min-width: 0;
+    font-size: var(--text-small);
+    color: var(--ink-muted);
+  }
+
+  .caption a {
+    color: var(--ink);
+  }
+
+  .dots {
+    display: flex;
+  }
+
+  .dot,
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    border-radius: var(--radius-button);
+    cursor: pointer;
+  }
+
+  .dot span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1.5px var(--ink);
+  }
+
+  .dot[aria-current='true'] span {
+    background: var(--ink);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slide,
+    .slide :global(model-viewer) {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const ADVANCE_MS = 10_000;
+  const DRAG_PAUSE_MS = 10_000;
+  const TICK_MS = 250;
+
+  type ModelViewer = HTMLElement & {
+    model?: { materials: { pbrMetallicRoughness: { setBaseColorFactor(c: string): void } }[] };
+  };
+
+  const root = document.querySelector<HTMLElement>('[data-carousel]');
+  if (root) init(root);
+
+  function init(root: HTMLElement) {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const captions = [...root.querySelectorAll<HTMLElement>('[data-caption]')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-toggle]')!;
+    const frame = root.querySelector<HTMLElement>('[data-frame]')!;
+    const iconPause = toggle.querySelector<HTMLElement>('[data-icon-pause]')!;
+    const iconPlay = toggle.querySelector<HTMLElement>('[data-icon-play]')!;
+    const n = slides.length;
+
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let current = 0;
+    let userPaused = reduceMotion;
+    let pointerOver = false;
+    let lastDrag = -Infinity;
+    let onScreen = true;
+    let elapsed = 0;
+    let libReady = false;
+    const viewers = new Map<number, ModelViewer>();
+
+    const running = () =>
+      !userPaused && !pointerOver && onScreen && !document.hidden && performance.now() - lastDrag >= DRAG_PAUSE_MS;
+
+    function setToggle() {
+      toggle.setAttribute('aria-label', userPaused ? 'Play rotation' : 'Pause rotation');
+      iconPause.hidden = userPaused;
+      iconPlay.hidden = !userPaused;
+    }
+
+    function updateRotate() {
+      viewers.forEach((mv, i) => mv.toggleAttribute('auto-rotate', i === current && !userPaused));
+    }
+
+    function ensureViewer(i: number) {
+      if (!libReady || viewers.has(i)) return;
+      const slide = slides[i]!;
+      const mv = document.createElement('model-viewer') as ModelViewer;
+      mv.setAttribute('src', slide.dataset.model!);
+      mv.setAttribute('alt', slide.dataset.alt!);
+      mv.setAttribute('camera-controls', '');
+      mv.setAttribute('disable-zoom', '');
+      mv.setAttribute('disable-pan', '');
+      mv.setAttribute('touch-action', 'pan-y');
+      mv.setAttribute('interaction-prompt', 'none');
+      mv.setAttribute('rotation-per-second', '30deg');
+      mv.setAttribute('auto-rotate-delay', '0');
+      mv.setAttribute('loading', 'eager');
+      // Hide model-viewer's built-in loading bar; the poster already covers loading.
+      const bar = document.createElement('div');
+      bar.slot = 'progress-bar';
+      mv.append(bar);
+      mv.addEventListener('load', () => {
+        // STL files carry no color, so the filament color is applied at runtime.
+        mv.model?.materials.forEach((m) => m.pbrMetallicRoughness.setBaseColorFactor(slide.dataset.color!));
+        slide.classList.add('has-model');
+      });
+      // On a load or WebGL failure the poster simply stays visible.
+      mv.addEventListener('error', () => slide.classList.remove('has-model'));
+      mv.addEventListener('camera-change', (e) => {
+        if ((e as CustomEvent<{ source: string }>).detail.source === 'user-interaction') lastDrag = performance.now();
+      });
+      slide.append(mv);
+      viewers.set(i, mv);
+    }
+
+    function show(i: number) {
+      current = i;
+      elapsed = 0;
+      slides.forEach((s, k) => {
+        const active = k === i;
+        s.classList.toggle('is-active', active);
+        s.toggleAttribute('inert', !active);
+        if (active) s.removeAttribute('aria-hidden');
+        else s.setAttribute('aria-hidden', 'true');
+      });
+      captions.forEach((c, k) => (c.hidden = k !== i));
+      dots.forEach((d, k) => (k === i ? d.setAttribute('aria-current', 'true') : d.removeAttribute('aria-current')));
+      ensureViewer(i);
+      ensureViewer((i + 1) % n); // preload the next model while this one shows
+      updateRotate();
+    }
+
+    dots.forEach((d, k) => d.addEventListener('click', () => show(k)));
+
+    toggle.addEventListener('click', () => {
+      userPaused = !userPaused;
+      setToggle();
+      updateRotate();
+    });
+
+    frame.addEventListener('pointerenter', () => (pointerOver = true));
+    frame.addEventListener('pointerleave', () => (pointerOver = false));
+    frame.addEventListener('pointercancel', () => (pointerOver = false));
+
+    new IntersectionObserver(([entry]) => (onScreen = entry!.isIntersecting)).observe(root);
+
+    setInterval(() => {
+      if (!running()) return;
+      elapsed += TICK_MS;
+      if (elapsed >= ADVANCE_MS) show((current + 1) % n);
+    }, TICK_MS);
+
+    setToggle();
+
+    const load = () =>
+      import('@google/model-viewer')
+        .then(() => {
+          libReady = true;
+          show(current);
+        })
+        .catch(() => {
+          /* posters stay up */
+        });
+    const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(load) : setTimeout(load, 1000));
+    if (matchMedia('(pointer: coarse)').matches) {
+      // Touch devices (phones, tablets): the 1 MB 3D library waits for the first
+      // scroll or touch so it never slows the first screen; the poster shows until then.
+      const events = ['scroll', 'touchstart', 'pointerdown', 'keydown'] as const;
+      const start = () => {
+        events.forEach((e) => removeEventListener(e, start));
+        idle();
+      };
+      events.forEach((e) => addEventListener(e, start, { once: true, passive: true }));
+    } else {
+      idle();
+    }
+  }
+</script>

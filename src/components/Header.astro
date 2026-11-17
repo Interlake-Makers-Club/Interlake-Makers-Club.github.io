@@ -1,0 +1,212 @@
+---
+import Icon from './Icon.astro';
+import mark from '../assets/logo/mark.svg';
+import type { Site } from '../lib/site';
+
+interface Props {
+  site: Site;
+}
+const { site } = Astro.props;
+
+const links = [
+  { href: '#projects', label: 'Projects' },
+  { href: '#how', label: 'How it works' },
+  { href: '#about', label: 'About' },
+  { href: '#faq', label: 'FAQ' },
+  { href: '#contact', label: 'Contact' },
+];
+---
+
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a href="#top" class="brand">
+      <img src={mark.src} alt="" width="32" height="32" />
+      <span>Makers' Club</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Main">
+      <ul role="list">
+        {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <a class="btn btn--primary header-cta" href={site.requestFormUrl} target="_blank" rel="noopener">
+      Request a print<Icon name="external" /><span class="visually-hidden"> (opens in new tab)</span>
+    </a>
+
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu" data-menu-btn>
+      <span data-icon-open><Icon name="menu" /></span>
+      <span data-icon-close hidden><Icon name="close" /></span>
+    </button>
+  </div>
+
+  <nav id="mobile-menu" class="mobile-menu" aria-label="Main" hidden data-menu>
+    <ul role="list" class="container">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid transparent;
+  }
+
+  .site-header.is-scrolled {
+    border-bottom-color: var(--line);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-16);
+    height: var(--header-h);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    margin-right: auto;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .brand img {
+    height: var(--logo-h);
+    width: auto;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .desktop-nav ul {
+    display: flex;
+    gap: var(--space-32);
+    margin: 0;
+  }
+
+  .desktop-nav a,
+  .mobile-menu a {
+    text-decoration: none;
+  }
+
+  .desktop-nav a:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* Small button size below 1024px */
+  .header-cta {
+    min-height: var(--button-h-small);
+    padding: 10px var(--space-16);
+    font-size: var(--text-button-small);
+  }
+
+  .menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-button);
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .mobile-menu {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mobile-menu ul {
+    margin: 0;
+    padding-block: var(--space-8);
+  }
+
+  .mobile-menu a {
+    display: flex;
+    align-items: center;
+    height: 56px;
+    font-size: var(--text-large);
+  }
+
+  @media (min-width: 1024px) {
+    .desktop-nav {
+      display: block;
+    }
+
+    .desktop-nav {
+      margin-right: var(--space-16);
+    }
+
+    .header-cta {
+      min-height: var(--button-h);
+      padding: 14px var(--space-24);
+      font-size: var(--text-button);
+    }
+
+    .menu-btn,
+    .mobile-menu {
+      display: none;
+    }
+  }
+
+  .brand span,
+  .header-cta {
+    white-space: nowrap;
+  }
+
+  /* Below 480px the wordmark no longer fits beside the button and menu; it stays for screen readers. */
+  @media (max-width: 479px) {
+    .brand span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const btn = document.querySelector<HTMLButtonElement>('[data-menu-btn]')!;
+  const menu = document.querySelector<HTMLElement>('[data-menu]')!;
+  const iconOpen = btn.querySelector<HTMLElement>('[data-icon-open]')!;
+  const iconClose = btn.querySelector<HTMLElement>('[data-icon-close]')!;
+
+  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 8);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  function setOpen(open: boolean) {
+    menu.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    iconOpen.hidden = open;
+    iconClose.hidden = !open;
+  }
+
+  btn.addEventListener('click', () => setOpen(Boolean(menu.hidden)));
+  menu.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !menu.hidden) {
+      setOpen(false);
+      btn.focus();
+    }
+  });
+</script>

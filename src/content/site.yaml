@@ -1,0 +1,146 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# ALL editable website content lives in this one file.
+#
+# Lines marked  TODO(Q#)  are placeholders waiting on a real answer.
+# The Q-numbers match the "Open questions" list in the PRD.
+# Run  npm run todo  to list every placeholder still left.
+#
+# Image paths are relative to this file (../assets/...).
+# The build checks every field; if something is wrong it stops and names it.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Link to the print-request Google Form (must start with https://forms.gle/ or https://docs.google.com/forms/)
+requestFormUrl: https://forms.gle/REPLACE_ME # TODO(Q7)
+
+# Club-owned email address
+email: makersclub@example.com # TODO(Q4)
+
+# Instagram handle, without the @
+instagram: REPLACE_ME # TODO(Q5)
+
+# Extra channels shown next to email + Instagram (0–3). icon: tiktok | youtube | discord
+# Example:
+#   - label: TikTok
+#     url: https://www.tiktok.com/@yourclub
+#     icon: tiktok
+extraLinks: [] # TODO(Q6) default: email + Instagram only
+
+stats:
+  members: { value: 0, suffix: "" } # TODO(Q8)
+  prints: { value: 0, suffix: "+" } # TODO(Q9)
+  donated: { value: 0, suffix: "+" } # TODO(Q10)
+  donatedLabel: items donated # TODO(Q10) "items donated" or "people helped"
+  asOf: 2026-11 # Month the numbers were counted (never shown on the site). Update when numbers change.
+
+policy:
+  maxSize: 20 × 20 × 20 cm # PRD default (Q11)
+  maxCopies: 10 # PRD default (Q12)
+  turnaround: 2 weeks # PRD default (Q13). Must read correctly after "usually ..."
+
+meeting:
+  time: REPLACE_ME (e.g. Thursdays after school) # TODO(Q20)
+  room: REPLACE_ME (e.g. Room 214) # TODO(Q20)
+
+# 60 words max. Draft from the PRD; approve or replace.
+mission: >- # TODO(Q19) approve or replace
+  We believe a 3D printer is most useful when it's making something for someone else.
+  Makers' Club is a student-run community at Interlake High School where members learn
+  to design and print, then put those skills to work: free prints for people who need
+  them, and hands-on demos at outreach events around the Eastside.
+
+# Hero 3D carousel: 3 to 5 models.
+#   model:     .glb file in public/models/ (3 MB max, 100k triangles max)
+#   poster:    1200 × 1200 photo of the real print, in src/assets/posters/
+#   caption:   40 characters max
+#   color:     filament color as a hex code
+#   alt:       describes the object, for screen readers
+#   projectId: optional; links the caption to a project below
+heroModels: # TODO(Q16)
+  - model: /models/placeholder-model-1.glb
+    poster: ../assets/posters/placeholder-model-1.png
+    caption: Placeholder model 1
+    color: "#C2410C"
+    alt: Placeholder ring shape until the club's first model is added
+    projectId: placeholder-project-1
+  - model: /models/placeholder-model-2.glb
+    poster: ../assets/posters/placeholder-model-2.png
+    caption: Placeholder model 2
+    color: "#303536"
+    alt: Placeholder cube shape until the club's second model is added
+  - model: /models/placeholder-model-3.glb
+    poster: ../assets/posters/placeholder-model-3.png
+    caption: Placeholder model 3
+    color: "#5A6062"
+    alt: Placeholder cylinder shape until the club's third model is added
+
+# Projects (at least 3). Shown in "order" (lowest first).
+#   id:          lowercase-with-dashes, unique
+#   title:       40 characters max
+#   summary:     90 characters max (one line on the card)
+#   description: 120 words max (shown in the pop-up)
+#   images:      1 to 4; the first one must still look right cropped to 4:3
+#   madeFor:     optional, 40 characters max
+projects: # TODO(Q15)
+  - id: placeholder-project-1
+    title: Placeholder project 1
+    summary: One-line summary of what was made and why it helps.
+    description: >-
+      A short write-up of the project: what it is, who it was for, and how the
+      club designed and printed it. Replace this placeholder with the real story.
+    images:
+      - src: ../assets/projects/placeholder-project-1.png
+        alt: Placeholder image for project 1
+    year: 2026
+    madeFor: Placeholder recipient
+    order: 1
+  - id: placeholder-project-2
+    title: Placeholder project 2
+    summary: One-line summary of what was made and why it helps.
+    description: >-
+      A short write-up of the project. Replace this placeholder with the real story.
+    images:
+      - src: ../assets/projects/placeholder-project-2.png
+        alt: Placeholder image for project 2
+    year: 2026
+    order: 2
+  - id: placeholder-project-3
+    title: Placeholder project 3
+    summary: One-line summary of what was made and why it helps.
+    description: >-
+      A short write-up of the project. Replace this placeholder with the real story.
+    images:
+      - src: ../assets/projects/placeholder-project-3.png
+        alt: Placeholder image for project 3
+    year: 2026
+    order: 3
+
+# Quotes from people the club printed for. The section is hidden while this is empty.
+#   text: 280 characters max
+#   role: e.g. "Teacher, Odle Middle School"
+#   permission: must be true = written permission to publish was received
+# Example:
+#   - text: "..."
+#     name: Jane Doe
+#     role: Teacher, Odle Middle School
+#     projectId: placeholder-project-1
+#     permission: true
+quotes: [] # TODO(Q17)
+
+# Officers: full name, role, square photo (at least 600 × 600, face centered).
+officers: # TODO(Q18)
+  - name: Officer Name
+    role: Officer role
+    photo: ../assets/officers/placeholder-officer-1.png
+    order: 1
+  - name: Officer Name
+    role: Officer role
+    photo: ../assets/officers/placeholder-officer-2.png
+    order: 2
+  - name: Officer Name
+    role: Officer role
+    photo: ../assets/officers/placeholder-officer-3.png
+    order: 3
+  - name: Officer Name
+    role: Officer role
+    photo: ../assets/officers/placeholder-officer-4.png
+    order: 4

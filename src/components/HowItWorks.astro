@@ -1,0 +1,80 @@
+---
+import Icon from './Icon.astro';
+import type { Site } from '../lib/site';
+
+interface Props {
+  site: Site;
+}
+const { site } = Astro.props;
+
+const steps = [
+  {
+    title: 'Tell us what you need',
+    text: "Fill out the request form with what it is, who it's for, and a file link or a sketch.",
+  },
+  {
+    title: 'We confirm and print',
+    text: `An officer emails you to confirm size, color and timing, then we print it, usually within ${site.policy.turnaround}.`,
+  },
+  {
+    title: 'Pick it up',
+    // TODO(Q22) PRD default: pickup arranged by email
+    text: "We arrange a pickup by email. It's free, and the filament is on us.",
+  },
+];
+---
+
+<section id="how" class="section" aria-labelledby="how-title">
+  <div class="container">
+    <h2 id="how-title">how a print request works</h2>
+    <ol role="list" class="steps">
+      {
+        steps.map((s, i) => (
+          <li class="step">
+            <span class="numeral" aria-hidden="true">
+              {i + 1}
+            </span>
+            <h3>
+              <span class="visually-hidden">Step {i + 1}: </span>
+              {s.title}
+            </h3>
+            <p>{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+    <a class="btn btn--primary" href={site.requestFormUrl} target="_blank" rel="noopener">
+      Request a print<Icon name="external" /><span class="visually-hidden"> (opens in new tab)</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .steps {
+    display: grid;
+    gap: var(--space-32);
+    margin: 0 0 var(--space-48);
+  }
+
+  .step {
+    display: grid;
+    gap: var(--space-8);
+    align-content: start;
+  }
+
+  .numeral {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-variation-settings: var(--heading-variation);
+    font-size: var(--text-h2);
+    line-height: 1;
+    color: var(--accent);
+  }
+
+  @media (min-width: 1024px) {
+    .steps {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-48);
+    }
+  }
+</style>

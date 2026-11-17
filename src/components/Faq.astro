@@ -1,0 +1,107 @@
+---
+import Icon from './Icon.astro';
+import type { Site } from '../lib/site';
+
+interface Props {
+  site: Site;
+}
+const { site } = Astro.props;
+const { policy, meeting, email } = site;
+
+const faqs = [
+  {
+    q: 'Is it really free?',
+    a: `Yes. Anyone can request a print and we cover the filament. We can print up to ${policy.maxCopies} copies of a part up to ${policy.maxSize}.`,
+  },
+  {
+    q: 'Who can request a print?',
+    a: 'Anyone: students, teachers, families, and community groups. Projects that help someone get priority.',
+  },
+  {
+    // TODO(Q14) PRD default: the club designs from a description or sketch too
+    q: 'Do I need a 3D file?',
+    a: "No. Send a link to a file if you have one (Printables, Thingiverse, Google Drive). If not, describe it or attach a sketch and we'll design it. Design requests take longer.",
+  },
+  {
+    q: 'How long does it take?',
+    a: `Usually ${policy.turnaround} after we confirm details with you. Tell us your deadline in the form.`,
+  },
+  {
+    q: "What won't you print?",
+    a: 'Weapons or weapon parts, anything that breaks school rules, and copies of trademarked or copyrighted designs made to sell.',
+  },
+  {
+    q: 'Can you come to our event?',
+    a: `We'd love to. Email ${email} with the date, location and what you have in mind.`,
+  },
+  {
+    q: 'How do I join?',
+    a: `If you're an Interlake student, come to a meeting: ${meeting.time} in ${meeting.room}. No experience needed.`,
+  },
+];
+---
+
+<section id="faq" class="section" aria-labelledby="faq-title">
+  <div class="container">
+    <h2 id="faq-title">questions</h2>
+    <div class="list">
+      {
+        faqs.map((f) => (
+          <details>
+            <summary>
+              <span>{f.q}</span>
+              <Icon name="plus" class="plus" />
+            </summary>
+            <p>{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .list {
+    max-width: 68ch;
+    border-top: 1px solid var(--line);
+  }
+
+  details {
+    border-bottom: 1px solid var(--line);
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-16);
+    min-height: var(--tap);
+    padding-block: var(--space-16);
+    font-size: var(--text-h3);
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary :global(.plus) {
+    transition: transform var(--dur);
+  }
+
+  details[open] summary :global(.plus) {
+    transform: rotate(45deg);
+  }
+
+  details p {
+    padding-bottom: var(--space-24);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    summary :global(.plus) {
+      transition: none;
+    }
+  }
+</style>

@@ -1,0 +1,176 @@
+---
+import { Picture } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { Site } from '../lib/site';
+
+interface Props {
+  project: Site['projects'][number];
+}
+const { project: p } = Astro.props;
+const many = p.images.length > 1;
+---
+
+<dialog id={`dialog-${p.id}`} class="dialog" aria-labelledby={`dialog-title-${p.id}`} data-project>
+  <button type="button" class="close" aria-label="Close" data-close><Icon name="close" /></button>
+  <div class="gallery" data-gallery>
+    <div class="track" data-track tabindex={many ? 0 : undefined} aria-label={many ? `${p.title} photos` : undefined}>
+      {
+        p.images.map((img) => (
+          <div class="slide">
+            <Picture
+              src={img.src}
+              alt={img.alt}
+              widths={[600, 1000, 1400]}
+              sizes="(min-width: 800px) 760px, 100vw"
+              formats={['avif', 'webp']}
+            />
+          </div>
+        ))
+      }
+    </div>
+    {
+      many && (
+        <>
+          <button type="button" class="arrow prev" aria-label="Previous photo" data-prev>
+            <Icon name="left" />
+          </button>
+          <button type="button" class="arrow next" aria-label="Next photo" data-next>
+            <Icon name="right" />
+          </button>
+        </>
+      )
+    }
+  </div>
+  <div class="body">
+    <h2 id={`dialog-title-${p.id}`}>{p.title}</h2>
+    <p>{p.description}</p>
+    {p.madeFor && <p class="made-for">Made for: {p.madeFor}</p>}
+  </div>
+</dialog>
+
+<style>
+  .dialog {
+    width: min(760px, calc(100vw - 2 * var(--space-16)));
+    max-height: calc(100svh - 2 * var(--space-16));
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    color: var(--ink);
+    box-shadow: var(--dialog-shadow);
+    overflow: auto;
+  }
+
+  .dialog::backdrop {
+    background: var(--backdrop);
+  }
+
+  .dialog[open] {
+    animation: fade-in var(--dur-fast) ease-out;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .close {
+    position: absolute;
+    top: var(--space-12);
+    right: var(--space-12);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border: 0;
+    border-radius: 50%;
+    background: var(--bg);
+    cursor: pointer;
+  }
+
+  .gallery {
+    position: relative;
+  }
+
+  .track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .slide {
+    flex: 0 0 100%;
+    aspect-ratio: 4 / 3;
+    scroll-snap-align: start;
+  }
+
+  .slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .arrow {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--tap);
+    height: var(--tap);
+    border: 0;
+    border-radius: 50%;
+    background: var(--bg);
+    cursor: pointer;
+  }
+
+  .prev {
+    left: var(--space-12);
+  }
+
+  .next {
+    right: var(--space-12);
+  }
+
+  .body {
+    display: grid;
+    gap: var(--space-16);
+    padding: var(--space-32);
+  }
+
+  .body h2 {
+    margin-bottom: 0;
+  }
+
+  .made-for {
+    color: var(--ink-muted);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dialog[open] {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-gallery]').forEach((g) => {
+    const track = g.querySelector<HTMLElement>('[data-track]')!;
+    const behavior: ScrollBehavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    g.querySelector('[data-prev]')?.addEventListener('click', () =>
+      track.scrollBy({ left: -track.clientWidth, behavior }),
+    );
+    g.querySelector('[data-next]')?.addEventListener('click', () =>
+      track.scrollBy({ left: track.clientWidth, behavior }),
+    );
+  });
+</script>

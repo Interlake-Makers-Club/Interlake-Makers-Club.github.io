@@ -1,0 +1,46 @@
+---
+// Inline SVG icons: UI icons from lucide-static, brand glyphs from simple-icons.
+// Icons are decorative (aria-hidden); the link or button around them carries the label.
+import mail from 'lucide-static/icons/mail.svg?raw';
+import menu from 'lucide-static/icons/menu.svg?raw';
+import close from 'lucide-static/icons/x.svg?raw';
+import copy from 'lucide-static/icons/copy.svg?raw';
+import plus from 'lucide-static/icons/plus.svg?raw';
+import external from 'lucide-static/icons/external-link.svg?raw';
+import pause from 'lucide-static/icons/pause.svg?raw';
+import play from 'lucide-static/icons/play.svg?raw';
+import left from 'lucide-static/icons/chevron-left.svg?raw';
+import right from 'lucide-static/icons/chevron-right.svg?raw';
+import instagram from 'simple-icons/icons/instagram.svg?raw';
+import tiktok from 'simple-icons/icons/tiktok.svg?raw';
+import youtube from 'simple-icons/icons/youtube.svg?raw';
+import discord from 'simple-icons/icons/discord.svg?raw';
+
+const icons = { mail, menu, close, copy, plus, external, pause, play, left, right, instagram, tiktok, youtube, discord };
+export type IconName = keyof typeof icons;
+
+interface Props {
+  name: IconName;
+  class?: string;
+}
+const { name, class: className } = Astro.props;
+const brand = ['instagram', 'tiktok', 'youtube', 'discord'].includes(name);
+
+// Normalize: drop the <title>, size to --icon, mark decorative, follow currentColor.
+let svg = icons[name]
+  .replace(/<!--[\s\S]*?-->/g, '')
+  .replace(/<title>.*?<\/title>/, '')
+  .replace(/<svg[^>]*>/, (open) => open.replace(/\s(width|height|class)="[^"]*"/g, ''))
+  .replace('<svg', `<svg aria-hidden="true" focusable="false" class="icon${className ? ' ' + className : ''}"`);
+if (brand) svg = svg.replace('<svg', '<svg fill="currentColor"');
+---
+
+<Fragment set:html={svg} />
+
+<style is:global>
+  .icon {
+    width: var(--icon);
+    height: var(--icon);
+    flex: none;
+  }
+</style>

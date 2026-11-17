@@ -1,0 +1,84 @@
+---
+import { Picture } from 'astro:assets';
+import type { Site } from '../lib/site';
+
+interface Props {
+  site: Site;
+}
+const { site } = Astro.props;
+---
+
+<section id="about" class="section" aria-labelledby="about-title">
+  <div class="container">
+    <h2 id="about-title">our mission</h2>
+    <p class="large-text">{site.mission}</p>
+
+    <h3 class="officers-title">the officers</h3>
+    <ul role="list" class="officers">
+      {
+        site.officers.map((o) => (
+          <li class="officer">
+            <Picture
+              src={o.photo}
+              alt={`Photo of ${o.name}`}
+              widths={[300, 600]}
+              sizes="(min-width: 1024px) 280px, (min-width: 640px) 33vw, 50vw"
+              formats={['avif', 'webp']}
+            />
+            <span class="name">{o.name}</span>
+            <span class="role">{o.role}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .officers-title {
+    margin-top: var(--space-64);
+    margin-bottom: var(--space-24);
+  }
+
+  .officers {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-24);
+    margin: 0;
+  }
+
+  .officer {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+  }
+
+  .officer :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-card);
+    margin-bottom: var(--space-8);
+  }
+
+  .name {
+    font-weight: 600;
+  }
+
+  .role {
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 640px) {
+    .officers {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .officers {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>
