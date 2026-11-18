@@ -38,7 +38,7 @@ const site = defineCollection({
           members: z.object({ value: z.number().int().min(0), suffix: z.enum(['', '+']) }),
           prints: z.object({ value: z.number().int().min(0), suffix: z.enum(['', '+']) }),
           donated: z.object({ value: z.number().int().min(0), suffix: z.enum(['', '+']) }),
-          donatedLabel: z.enum(['items donated', 'people helped']),
+          donatedLabel: z.enum(['items donated', 'people helped', 'teachers helped']),
           asOf: z.string().regex(/^\d{4}-\d{2}$/, 'Use YYYY-MM'),
         }),
         policy: z.object({

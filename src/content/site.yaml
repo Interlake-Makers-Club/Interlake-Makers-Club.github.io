@@ -13,7 +13,7 @@
 requestFormUrl: https://forms.gle/REPLACE_ME # TODO(Q7)
 
 # Club-owned email address
-email: makersclub@example.com # TODO(Q4)
+email: interlake_makers@outlook.com
 
 # Instagram handle, without the @
 instagram: REPLACE_ME # TODO(Q5)
@@ -26,14 +26,14 @@ instagram: REPLACE_ME # TODO(Q5)
 extraLinks: [] # TODO(Q6) default: email + Instagram only
 
 stats:
-  members: { value: 0, suffix: "" } # TODO(Q8)
-  prints: { value: 0, suffix: "+" } # TODO(Q9)
-  donated: { value: 0, suffix: "+" } # TODO(Q10)
-  donatedLabel: items donated # TODO(Q10) "items donated" or "people helped"
+  members: { value: 61, suffix: "" }
+  prints: { value: 100, suffix: "+" }
+  donated: { value: 9, suffix: "" }
+  donatedLabel: teachers helped # "items donated", "people helped" or "teachers helped"
   asOf: 2026-11 # Month the numbers were counted (never shown on the site). Update when numbers change.
 
 policy:
-  maxSize: 20 × 20 × 20 cm # PRD default (Q11)
+  maxSize: 256 × 256 × 256 mm # Largest printer: Bambu Lab A1 (also: 2 Enders, Prusa MINI, Bambu Lab A1 mini)
   maxCopies: 10 # PRD default (Q12)
   turnaround: 2 weeks # PRD default (Q13). Must read correctly after "usually ..."
 

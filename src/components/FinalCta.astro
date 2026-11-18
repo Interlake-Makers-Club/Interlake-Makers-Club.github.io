@@ -71,8 +71,14 @@ const { site } = Astro.props;
     margin: var(--space-24) 0 0;
   }
 
+  .contact {
+    max-width: 100%;
+  }
+
   .contact li {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: var(--space-8);
   }
