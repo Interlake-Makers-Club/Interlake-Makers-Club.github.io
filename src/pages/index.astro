@@ -17,20 +17,46 @@ import mark from '../assets/logo/mark.svg';
 
 const site = await getSite();
 
-const title = "Interlake Makers' Club · Free student 3D printing in Bellevue, WA";
+const title = "Free 3D Printing Service in Bellevue, WA | Interlake Makers' Club";
+// Equal to the hero subtitle (PRD).
 const description =
-  "Interlake High School's Makers' Club is a student-run 3D printing community in Bellevue, WA. We design and print useful things for anyone who asks, free, and bring our printers to local outreach events.";
+  "Interlake High School's Makers' Club is a student-run 3D printing community in Bellevue, WA. We offer a free 3D printing service: send us a file or an idea and we'll print it for you. We also bring our printers to outreach events around the Eastside.";
 const canonical = new URL('/', Astro.site).href;
 const ogImage = new URL('/og.png', Astro.site).href;
 
+// Structured data so search engines understand who the club is and what it offers.
+// Placeholder links (Instagram, request form) are left out until they are real.
+const orgId = `${canonical}#organization`;
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: "Interlake Makers' Club",
-  url: canonical,
-  email: site.email,
-  logo: new URL(mark.src, Astro.site).href,
-  sameAs: [`https://www.instagram.com/${site.instagram}/`],
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': orgId,
+      name: "Interlake Makers' Club",
+      alternateName: "Interlake High School Makers' Club",
+      url: canonical,
+      email: site.email,
+      logo: new URL(mark.src, Astro.site).href,
+      description,
+      parentOrganization: {
+        '@type': 'HighSchool',
+        name: 'Interlake High School',
+        address: { '@type': 'PostalAddress', addressLocality: 'Bellevue', addressRegion: 'WA', addressCountry: 'US' },
+      },
+      ...(site.instagram === 'REPLACE_ME' ? {} : { sameAs: [`https://www.instagram.com/${site.instagram}/`] }),
+    },
+    {
+      '@type': 'Service',
+      name: 'Free 3D printing service',
+      serviceType: '3D printing',
+      description: `Free 3D printing by student volunteers: send a file or an idea and the club prints it. Parts up to ${site.policy.maxSize}, up to ${site.policy.maxCopies} copies, picked up at Interlake High School.`,
+      provider: { '@id': orgId },
+      areaServed: { '@type': 'City', name: 'Bellevue, WA' },
+      ...(site.requestFormUrl.includes('REPLACE_ME') ? {} : { url: site.requestFormUrl }), // TODO(Q7) placeholder guard
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    },
+  ],
 };
 ---
 
